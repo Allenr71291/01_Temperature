@@ -17,7 +17,7 @@ class Converter:
         self.temp_Converter_label.grid(row=0)
 
         self.help_button = Button(self.Converter_frame,
-                                  text="help",
+                                  text="Help",
                                   padx=10,
                                   pady=10, command=self.help)
         self.help_button.grid(row=1)
