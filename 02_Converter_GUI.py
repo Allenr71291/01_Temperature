@@ -72,7 +72,6 @@ class Converter:
         self.help_button.grid(row=0, column=1)
 
     def temp_convert(self, low):
-        print(low)
 
         error = "#ffafaf"
         # Retrieve amount entered into Entry field
@@ -81,6 +80,7 @@ class Converter:
         try:
             to_convert = float(to_convert)
             has_errors = "no"
+            self.to_convert_entry.configure(bg="white")
 
             # Check amount and convert to Farhrenheit
             if low == -273 and to_convert >= low:
@@ -96,6 +96,7 @@ class Converter:
                 celsius = self.round_it(celsius)
                 answer = "{} degrees C is {} degrees F".format(to_convert, celsius)
 
+
             else:
 
                 answer = "Too Cold!"
@@ -106,6 +107,8 @@ class Converter:
             # Round!!!
 
             # Display answer
+            if has_errors != "yes":
+                self.converted_label.configure(text=answer, fg="black")
 
             # Add Answer to list for history
 
@@ -114,6 +117,13 @@ class Converter:
             self.converted_label.configure(text="Enter a number!!", fg="red")
             self.to_convert_entry.configure(bg=error)
 
+    def round_it(selfself, to_round):
+        if to_round % 1 == 0:
+            rounded = int(to_round)
+        else:
+            rounded = round(to_round, 1)
+
+        return rounded
 
 # main routine
 if __name__ == "__main__":
