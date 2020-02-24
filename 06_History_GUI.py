@@ -1,7 +1,8 @@
 from tkinter import *
 from functools import partial
 
-# 1.06 into history GUI part 2
+# 1.43 into history GUI part 2
+
 
 class Converter:
     def __init__(self, parent):
@@ -20,7 +21,7 @@ class Converter:
         self.Converter_frame.grid()
 
         self.temp_Converter_label = Label(self.Converter_frame,
-                                          text="Temperature Converter",
+                                          text="Calculation History",
                                           font=("Arial", "16", "bold"),
                                           bg=background_color,
                                           padx=10, pady=10)
@@ -34,11 +35,11 @@ class Converter:
 
     def history(self):
         print("You asked for History")
-        get_history = history(self)
+        get_history = History(self)
         get_history.history_text.configure(text="History text goes here")
 
 
-class history:
+class History:
     def __init__(self, partner):
 
         background = "light sky blue"
@@ -61,9 +62,25 @@ class history:
         self.how_heading.grid(row=0)
 
         # history text (label, row 1)
-        self.history_text = Label(self.history_frame, text="",
-                               justify=LEFT, width=40, bg=background, wrap=250)
+        self.history_text = Label(self.history_frame, text="Here are your most recent"
+                                                           "calculations. Please use"
+                                                           "the export button to create"
+                                                           "a text file of all your calculations"
+                                                           "for this session",
+                               justify=LEFT, width=40, bg=background, wrap=250,
+                                  font="arial 10 italic", fg="maroon")
         self.history_text.grid(row=1)
+
+        # History Output goes here... (row 3)
+
+        # Export / Dismiss Buttons Frame (row 2)
+        self.export_dismiss_frame = Frame(self.history_frame)
+        self.export_dismiss_frame.grid(Row=3, pady=10)
+
+        # Export button
+        self.export_button = Button(self.export_dismiss_frame, text="Export",
+                                    font="Arial 12 bold")
+        self.export_button.grid(row=0, column=0)
 
         # Dismiss button (row 2)
         self.dismiss_btn = Button(self.history_frame, text="Dismiss", width=10, bg=background,
