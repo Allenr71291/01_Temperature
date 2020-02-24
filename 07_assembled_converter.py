@@ -31,10 +31,10 @@ class Converter:
         self.history_button.grid(row=1)
 
     def history(self, calc_history):
-        history(self, calc_history)
+        History(self, calc_history)
 
 
-class history:
+class History:
     def __init__(self, partner, calc_history):
 
         background = "light sky blue"
