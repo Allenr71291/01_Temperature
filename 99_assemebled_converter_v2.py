@@ -10,13 +10,7 @@ class Converter:
         background_color = "springgreen2"
 
         # Initialise list to hold calculation history
-        self.all_calculations = ['1 degrees C is -17.2 degrees F',
-                                 '2 degrees C is -16.7 degrees F',
-                                 '3 degrees C is -16.1 degrees F',
-                                 '4 degrees C is 39.2 degrees F',
-                                 '5 degrees C is -15 degrees F',
-                                 '6 degrees C is 42.8 degrees F',
-                                 '7 degrees C is 44.6 degrees F']
+        self.all_calculations = []
 
         # Converter Frame
         self.converter_frame = Frame(bg=background_color,
@@ -77,6 +71,9 @@ class Converter:
                                        command=lambda: self.history(self.all_calculations))
         self.calc_hist_button.grid(row=0, column=0)
 
+        if len(self.all_calculations) == 0:
+            self.calc_hist_button.config(state=DISABLED)
+
         self.help_button = Button(self.hist_help_frame, font="Arial 12 bold",
                                   text="Help", width=5, command=self.help)
         self.help_button.grid(row=0, column=1)
@@ -106,9 +103,7 @@ class Converter:
                 celsius = self.round_it(celsius)
                 answer = "{} degrees C is {} degrees F".format(to_convert, celsius)
 
-
             else:
-
                 answer = "Too Cold!"
                 has_errors = "yes"
 
@@ -118,12 +113,15 @@ class Converter:
 
             # Display answer
             if has_errors != "yes":
-                self.converted_label.configure(text=answer, fg="black")
-
-            # Add Answer to list for history
-            if answer != "Too Cold":
                 self.all_calculations.append(answer)
+                self.calc_hist_button.config(state=NORMAL)
+                self.converted_label.configure(text=answer, fg="blue")
                 print(self.all_calculations)
+            else:
+                self.converted_label.configure(text="This is too cold! \nPlease "
+                                                    "enter a new value!", fg="red")
+                self.to_convert_entry.configure(bg=error)
+                print("This is too cold! Please enter a new value!")
 
         except ValueError:
             self.converted_label.configure(text="Enter a number!!", fg="red")
@@ -147,6 +145,7 @@ class Converter:
 
     def history(self, calc_history):
         History(self, calc_history)
+
 
 class Help:
     def __init__(self, partner):
@@ -221,7 +220,7 @@ class History:
         # Generate string from list of calculations...
         history_string = ""
 
-        if len(calc_history) >= 7:
+        if len(calc_history) > 7:
             for item in range(0, 7):
                 history_string += calc_history[len(calc_history)
                                                - item - 1] + "\n"
@@ -257,9 +256,8 @@ class History:
         self.dismiss_btn.grid(row=0, column=1)
 
     def close_history(self, partner):
-        partner.history_button.config(state=NORMAL)
+        partner.calc_hist_button.config(state=NORMAL)
         self.history_box.destroy()
-
 
 
 # main routine

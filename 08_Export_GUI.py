@@ -16,14 +16,14 @@ class Converter:
         self.Converter_frame.grid()
 
         self.temp_Converter_label = Label(self.Converter_frame,
-                                          text="Calculation History",
+                                          text="Export Calculations",
                                           font=("Arial", "16", "bold"),
                                           bg=background_color,
                                           padx=10, pady=10)
         self.temp_Converter_label.grid(row=0)
 
         self.history_button = Button(self.Converter_frame,
-                                  text="History",
+                                  text="Export",
                                   padx=10,pady=10,
                                   command=lambda: self.history(self.all_calc_list))
         self.history_button.grid(row=1)
@@ -51,7 +51,7 @@ class history:
 
         # Set up history heading (row 0)
         self.how_heading = Label(self.history_frame, text="History / Instructions",
-                                 font="arial 10 bold", bg=background)
+                                 font="arial 14 bold", bg=background)
         self.how_heading.grid(row=0)
 
         # history text (label, row 1)
@@ -95,7 +95,9 @@ class history:
 
         # Export button
         self.export_button = Button(self.export_dismiss_frame, text="Export",
-                                    font="Arial 10 ")
+                                    font="Arial 10 ",
+                                    command=lambda: self.export(calc_history))
+
         self.export_button.grid(row=0, column=0)
 
         # Dismiss button (col 1)
@@ -107,6 +109,63 @@ class history:
     def close_history(self, partner):
         partner.history_button.config(state=NORMAL)
         self.history_box.destroy()
+
+    def export(self, calc_history):
+        Export(self, calc_history)
+
+
+class Export:
+    def __init__(self, partner, calc_history):
+
+        print(calc_history)
+
+        background = "light sky blue"
+
+        # disable export button
+        partner.export_button.config(state=DISABLED)
+
+        # Sets up child window (export Box)
+        self.export_box = Toplevel()
+
+        self.export_box.protocol('WM_DELETE_WINDOW', partial(self.close_export, partner))
+
+        # Sets up GUI Frame
+        self.export_frame = Frame(self.export_box, width=300, bg=background)
+        self.export_frame.grid()
+
+        # Set up export heading (row 0)
+        self.how_heading = Label(self.export_frame, text="Export / Instructions",
+                                     font="arial 14 bold", bg=background)
+        self.how_heading.grid(row=0)
+
+        # export text (label, row 1)
+        self.export_text = Label(self.export_frame, text="Enter a filename in the box "
+                                                         "below and press the Save "
+                                                         "button to save your calculation "
+                                                         "history to a word file. " ,
+                                    justify=LEFT, width=40, bg=background, wrap=250,
+                                    font="arial 10 italic", fg="maroon")
+        self.export_text.grid(row=1)
+
+        # Export / Dismiss Buttons Frame (row 2)
+        self.export_dismiss_frame = Frame(self.export_frame)
+        self.export_dismiss_frame.grid(row=3, pady=10)
+
+        # Export button
+        self.export_button = Button(self.export_dismiss_frame, text="Export",
+                                    font="Arial 10 ",
+                                    command=lambda: self.export(self.all_calc_list))
+        self.export_button.grid(row=0, column=0)
+
+        # Dismiss button (col 1)
+        self.dismiss_btn = Button(self.export_dismiss_frame, text="Dismiss",
+                                    font="Arial 10 ",
+                                    command=partial(self.close_export, partner))
+        self.dismiss_btn.grid(row=0, column=1)
+
+    def close_export(self, partner):
+        partner.export_button.config(state=NORMAL)
+        self.export_box.destroy()
 
 
 # main routine
