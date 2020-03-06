@@ -1,6 +1,7 @@
 from tkinter import *
 from functools import partial
 
+# Exporting part 3 1:37
 
 class Converter:
     def __init__(self, parent):
@@ -147,25 +148,57 @@ class Export:
                                     font="arial 10 italic", fg="maroon")
         self.export_text.grid(row=1)
 
-        # Export / Dismiss Buttons Frame (row 2)
+        # file name entry box (row 2)
+        self.file_name_entry = Entry(self.export_frame, width=20,
+                                      font="Arial 14 bold")
+        self.file_name_entry.grid(row=2)
+
+        # Export / Dismiss Buttons Frame (row 3)
         self.export_dismiss_frame = Frame(self.export_frame)
         self.export_dismiss_frame.grid(row=3, pady=10)
 
         # Export button
-        self.export_button = Button(self.export_dismiss_frame, text="Export",
+        self.export_button = Button(self.export_dismiss_frame, text="Save",
                                     font="Arial 10 ",
-                                    command=lambda: self.export(self.all_calc_list))
+                                    command=lambda: self.save_history(partner, calc_history))
         self.export_button.grid(row=0, column=0)
 
         # Dismiss button (col 1)
-        self.dismiss_btn = Button(self.export_dismiss_frame, text="Dismiss",
+        self.dismiss_btn = Button(self.export_dismiss_frame, text="Cancel",
                                     font="Arial 10 ",
                                     command=partial(self.close_export, partner))
         self.dismiss_btn.grid(row=0, column=1)
 
-    def close_export(self, partner):
+    def close_export(self, partner, calc_history):
         partner.export_button.config(state=NORMAL)
         self.export_box.destroy()
+
+    def save_history(self, partner, calc_history):
+
+        valid_char = "[A-Za-a0-9_"
+        has_errors = "no"
+
+        filename = self.file_name_entry.get()
+        print(filename)
+
+        for letter in filename:
+            if re.match(valid_char, letter):
+                continue
+
+            elif letter ==" ":
+                problem = "(no spaces allowed)"
+
+            else:
+                problem = ("(no {}'s allowed)".format(letter))
+            has_errors = "yes"
+            break
+
+        if filename == "":
+            problem = "can't be blank"
+            has_errors = "yes"
+
+        if has_errors == "yes":
+
 
 
 # main routine
