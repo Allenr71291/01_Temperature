@@ -169,13 +169,16 @@ class Export:
                                     command=partial(self.close_export, partner))
         self.dismiss_btn.grid(row=0, column=1)
 
-    def close_export(self, partner, calc_history):
-        partner.export_button.config(state=NORMAL)
-        self.export_box.destroy()
+        self.save_error_label = Label(self.export_frame, text="", fg="maroon",
+                                    bg=background )
+        self.save_error_label.grid(row=4)
+
+        self.save_cancel_frame = Frame(self.export_frame)
+        self.save_cancel_frame.grid(row=5, pady=10)
 
     def save_history(self, partner, calc_history):
 
-        valid_char = "[A-Za-a0-9_"
+        valid_char = "[A-Za-z0-9_]"
         has_errors = "no"
 
         filename = self.file_name_entry.get()
@@ -190,6 +193,7 @@ class Export:
 
             else:
                 problem = ("(no {}'s allowed)".format(letter))
+
             has_errors = "yes"
             break
 
@@ -198,7 +202,26 @@ class Export:
             has_errors = "yes"
 
         if has_errors == "yes":
+            self.save_error_label.config(text="Invalid filename - {}".format(problem))
+            self.file_name_entry.config(bg="red")
+            print()
 
+        else:
+
+            filename = filename + ".txt"
+
+            f = open(filename, "w+")
+
+            for item in calc_history:
+                f.write(item + "\n")
+
+            f.close()
+
+            self.close_export(partner)
+
+    def close_export(self, partner):
+        partner.export_button.config(state=NORMAL)
+        self.export_box.destroy()
 
 
 # main routine

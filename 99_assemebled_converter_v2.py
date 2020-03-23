@@ -116,12 +116,12 @@ class Converter:
                 self.all_calculations.append(answer)
                 self.calc_hist_button.config(state=NORMAL)
                 self.converted_label.configure(text=answer, fg="blue")
-                print(self.all_calculations)
+                # print(self.all_calculations)
             else:
                 self.converted_label.configure(text="This is too cold! \nPlease "
                                                     "enter a new value!", fg="red")
                 self.to_convert_entry.configure(bg=error)
-                print("This is too cold! Please enter a new value!")
+                # print("This is too cold! Please enter a new value!")
 
         except ValueError:
             self.converted_label.configure(text="Enter a number!!", fg="red")
@@ -136,7 +136,7 @@ class Converter:
         return rounded
 
     def help(self):
-        print("You asked for help")
+        # print("You asked for help")
         get_help = Help(self)
 
         help_text="Help text goes here"
@@ -202,7 +202,7 @@ class History:
 
         # Set up history heading (row 0)
         self.how_heading = Label(self.history_frame, text="History / Instructions",
-                                 font="arial 10 bold", bg=background)
+                                 font="arial 14 bold", bg=background)
         self.how_heading.grid(row=0)
 
         # history text (label, row 1)
@@ -211,7 +211,7 @@ class History:
                                                            "the export button to create"
                                                            "a text file of all your calculations"
                                                            "for this session",
-                                  justify=LEFT, width=40, bg=background, wrap=250,
+                               justify=LEFT, width=40, bg=background, wrap=250,
                                   font="arial 10 italic", fg="maroon")
         self.history_text.grid(row=1)
 
@@ -220,15 +220,15 @@ class History:
         # Generate string from list of calculations...
         history_string = ""
 
-        if len(calc_history) > 7:
+        if len(calc_history) >=7:
             for item in range(0, 7):
                 history_string += calc_history[len(calc_history)
-                                               - item - 1] + "\n"
+                                               - item - 1]+"\n"
 
         else:
             for item in calc_history:
                 history_string += calc_history[len(calc_history) -
-                                               calc_history.index(item) - 1] + "\n"
+                                              calc_history.index(item) - 1] + "\n"
                 self.history_text.config(text="Here is your calculation "
                                               "history. You can use the "
                                               "export button to save this "
@@ -237,7 +237,7 @@ class History:
 
         # Label to display calculation history to user
         self.calc_label = Label(self.history_frame, text=history_string,
-                                bg=background, font="Arial 12", justify=LEFT)
+                                bg=background,font="Arial 12", justify=LEFT)
         self.calc_label.grid(row=2)
 
         # Export / Dismiss Buttons Frame (row 2)
@@ -246,7 +246,9 @@ class History:
 
         # Export button
         self.export_button = Button(self.export_dismiss_frame, text="Export",
-                                    font="Arial 10 ")
+                                    font="Arial 10 ",
+                                    command=lambda: self.export(calc_history))
+
         self.export_button.grid(row=0, column=0)
 
         # Dismiss button (col 1)
@@ -259,6 +261,117 @@ class History:
         partner.calc_hist_button.config(state=NORMAL)
         self.history_box.destroy()
 
+    def export(self, calc_history):
+        Export(self, calc_history)
+
+
+class Export:
+        def __init__(self, partner, calc_history):
+
+            # print(calc_history)
+
+            background = "light sky blue"
+
+            # disable export button
+            partner.export_button.config(state=DISABLED)
+
+            # Sets up child window (export Box)
+            self.export_box = Toplevel()
+
+            self.export_box.protocol('WM_DELETE_WINDOW', partial(self.close_export, partner))
+
+            # Sets up GUI Frame
+            self.export_frame = Frame(self.export_box, width=300, bg=background)
+            self.export_frame.grid()
+
+            # Set up export heading (row 0)
+            self.how_heading = Label(self.export_frame, text="Export / Instructions",
+                                     font="arial 14 bold", bg=background)
+            self.how_heading.grid(row=0)
+
+            # export text (label, row 1)
+            self.export_text = Label(self.export_frame, text="Enter a filename in the box "
+                                                             "below and press the Save "
+                                                             "button to save your calculation "
+                                                             "history to a word file. ",
+                                     justify=LEFT, width=40, bg=background, wrap=250,
+                                     font="arial 10 italic", fg="maroon")
+            self.export_text.grid(row=1)
+
+            # file name entry box (row 2)
+            self.file_name_entry = Entry(self.export_frame, width=20,
+                                         font="Arial 14 bold")
+            self.file_name_entry.grid(row=2)
+
+            # Export / Dismiss Buttons Frame (row 3)
+            self.export_dismiss_frame = Frame(self.export_frame)
+            self.export_dismiss_frame.grid(row=3, pady=10)
+
+            # Export button
+            self.export_button = Button(self.export_dismiss_frame, text="Save",
+                                        font="Arial 10 ",
+                                        command=lambda: self.save_history(partner, calc_history))
+            self.export_button.grid(row=0, column=0)
+
+            # Dismiss button (col 1)
+            self.dismiss_btn = Button(self.export_dismiss_frame, text="Cancel",
+                                      font="Arial 10 ",
+                                      command=partial(self.close_export, partner))
+            self.dismiss_btn.grid(row=0, column=1)
+
+            self.save_error_label = Label(self.export_frame, text="", fg="maroon",
+                                          bg=background)
+            self.save_error_label.grid(row=4)
+
+            self.save_cancel_frame = Frame(self.export_frame)
+            self.save_cancel_frame.grid(row=5, pady=10)
+
+        def save_history(self, partner, calc_history):
+
+            valid_char = "[A-Za-z0-9_]"
+            has_errors = "no"
+
+            filename = self.file_name_entry.get()
+            # print(filename)
+
+            for letter in filename:
+                if re.match(valid_char, letter):
+                    continue
+
+                elif letter == " ":
+                    problem = "(no spaces allowed)"
+
+                else:
+                    problem = ("(no {}'s allowed)".format(letter))
+
+                has_errors = "yes"
+                break
+
+            if filename == "":
+                problem = "can't be blank"
+                has_errors = "yes"
+
+            if has_errors == "yes":
+                self.save_error_label.config(text="Invalid filename - {}".format(problem))
+                self.file_name_entry.config(bg="red")
+                # print()
+
+            else:
+
+                filename = filename + ".txt"
+
+                f = open(filename, "w+")
+
+                for item in calc_history:
+                    f.write(item + "\n")
+
+                f.close()
+
+                self.close_export(partner)
+
+        def close_export(self, partner):
+            partner.export_button.config(state=NORMAL)
+            self.export_box.destroy()
 
 # main routine
 if __name__ == "__main__":
